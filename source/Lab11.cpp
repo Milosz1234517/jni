@@ -96,19 +96,30 @@ JNIEXPORT jobjectArray JNICALL Java_Lab11_sort01
 		jclass cBoolean = env->FindClass("java/lang/Boolean");
 		jmethodID cidB = env->GetMethodID(cBoolean, "<init>", "(Z)V");
 
-		double *tab = new double[len];
 
-		cout<<"Podaj elementy:\n";
+		jclass guiClass = env->FindClass("LGui;");
+		jmethodID guiConstructor = env->GetMethodID(guiClass, "<init>", "()V");
+		jobject guiObject = env->NewObject(guiClass, guiConstructor);
 
-		for(int i = 0; i < len; i++){
-			double val;
-			cin >> val;
-			tab[i] = val;
+		jfieldID setedFieldId = env->GetFieldID(guiClass, "dataSeted", "Z");
+		bool seted = env->GetBooleanField(guiObject, setedFieldId);
+
+		while(!seted){
+			seted = env->GetBooleanField(guiObject, setedFieldId);
+			Sleep(500);
 		}
 
-		cout<<"Podaj typ sortowania:\n";
-		bool ord;
-		cin >> ord;
+		jfieldID gaField = env->GetFieldID(guiClass, "a", "[D");
+		jobject ga = env->GetObjectField(guiObject, gaField);
+
+		jdoubleArray oarr = static_cast<jdoubleArray>(ga);
+		double *tab = env->GetDoubleArrayElements(oarr, NULL);
+
+		jfieldID orrField = env->GetFieldID(guiClass, "order", "Z");
+		bool ord = env->GetBooleanField(guiObject, orrField);
+
+		jmethodID disp = env->GetMethodID(guiClass, "dispose", "()V");
+		env->CallVoidMethod(guiObject, disp);
 
 		for(int i = 0; i < len; i++){
 			jobject result = env->NewObject(cDouble, cid, tab[i]);
