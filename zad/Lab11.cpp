@@ -78,8 +78,12 @@ JNIEXPORT jobjectArray JNICALL Java_Lab11_sort01
 
   JNIEXPORT void JNICALL Java_Lab11_sort03
   (JNIEnv *env, jobject obj){
+
 		jclass lab11 = env->GetObjectClass(obj);
+
 		jfieldID aField = env->GetFieldID(lab11, "a", "[Ljava/lang/Double;");
+		jfieldID orderField = env->GetFieldID(lab11, "order", "Ljava/lang/Boolean;");
+
 		jobject atab = env->GetObjectField(obj, aField);
 
 		jobjectArray arr = static_cast<jobjectArray>(atab);
@@ -89,12 +93,31 @@ JNIEXPORT jobjectArray JNICALL Java_Lab11_sort01
 		jclass cDouble = env->FindClass("java/lang/Double");
 		jmethodID cid = env->GetMethodID(cDouble, "<init>", "(D)V");
 
+		jclass cBoolean = env->FindClass("java/lang/Boolean");
+		jmethodID cidB = env->GetMethodID(cBoolean, "<init>", "(Z)V");
+
+		double *tab = new double[len];
+
+		cout<<"Podaj elementy:\n";
+
 		for(int i = 0; i < len; i++){
 			double val;
 			cin >> val;
-			jobject result = env->NewObject(cDouble, cid, val);
+			tab[i] = val;
+		}
+
+		cout<<"Podaj typ sortowania:\n";
+		bool ord;
+		cin >> ord;
+
+		for(int i = 0; i < len; i++){
+			jobject result = env->NewObject(cDouble, cid, tab[i]);
 			env->SetObjectArrayElement(arr, i, result);
 		}
 		
-		env->SetObjectField(obj, aField, arr);
+		jobject resultBool = env->NewObject(cBoolean, cidB, ord);
+		env->SetObjectField(obj, orderField, resultBool);
+
+		jmethodID mid = env->GetMethodID(lab11, "sort04", "()V");
+		env->CallVoidMethod(obj, mid);
   }
